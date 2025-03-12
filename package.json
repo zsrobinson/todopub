@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@doist/todoist-api-typescript": "^4.0.0-alpha.4",
     "astro": "^5.4.3"
   }
 }

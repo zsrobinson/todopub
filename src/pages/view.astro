@@ -1,0 +1,25 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { TodoistApi } from "@doist/todoist-api-typescript";
+import { decrypt } from "../lib/crypto";
+import { SECRET } from "astro:env/server";
+
+const search = Astro.url.searchParams;
+const id = search.get("id")!;
+if (!id) throw new Error("invalid search params");
+const text = await decrypt(id, SECRET);
+const [apiKey, projectId] = text.split(";");
+
+const client = new TodoistApi(apiKey);
+const { results: tasks } = await client.getTasks({ projectId });
+---
+
+<Layout>
+  <h1>Todoist Viewer: View</h1>
+  <p>{apiKey}</p>
+  <p>{projectId}</p>
+  <ul>
+    {tasks.map((task) => <li>{task.content}</li>)}
+  </ul>
+  <pre><code>{JSON.stringify(tasks, null, 2)}</code></pre>
+</Layout>
