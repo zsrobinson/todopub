@@ -46,7 +46,10 @@ if (Astro.request.method === "POST") {
       you want to ensure that the server admin isn't able to decrypt your token
       if they have access to it (and it's not recorded on the server when using
       this site), consider running your own instance and setting the secret
-      yourself.
+      yourself. These tokens are salted, so generating a new one with the same
+      data will result in a completely different token. If you no longer want
+      your project to be public, resetting your Todoist API key will revoke this
+      access.
     </p>
   </details>
 

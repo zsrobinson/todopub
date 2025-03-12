@@ -1,10 +1,11 @@
 ---
 import { cn } from "~/lib/utils";
 import "../styles/global.css";
-const { className } = Astro.props;
+const { className, title } = Astro.props;
 
 interface Props {
   className?: string;
+  title?: string;
 }
 ---
 
@@ -15,7 +16,7 @@ interface Props {
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title></title>
+    <title>{title || "TodoPub"}</title>
   </head>
 
   <body class={cn("mx-auto max-w-5xl p-8", className)}>

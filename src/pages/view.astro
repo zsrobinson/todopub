@@ -16,7 +16,7 @@ const project = await client.getProject(projectId);
 const { results: tasks } = await client.getTasks({ projectId });
 ---
 
-<Layout className="flex flex-col gap-4">
+<Layout className="flex flex-col gap-4" title={`TodoPub — ${project.name}`}>
   <p>
     Currently viewing a public project; copy the link to share with others.
     Visit the
