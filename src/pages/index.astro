@@ -1,9 +1,72 @@
 ---
+import { Input } from "~/components/ui/input";
 import Layout from "../layouts/Layout.astro";
+import { encrypt } from "../lib/crypto";
+import { SECRET } from "astro:env/server";
+import { Button } from "~/components/ui/button";
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const apiKey = data.get("api-key")!;
+    const projectId = data.get("project-id")!;
+
+    if (typeof apiKey !== "string" || typeof projectId !== "string") {
+      throw new Error("invalid form arguments");
+    }
+
+    const text = apiKey + ";" + projectId;
+    const token = await encrypt(text, SECRET);
+    return Astro.redirect(`/view?token=${token}`);
+  } catch (error) {
+    if (error instanceof Error) console.error(error.message);
+  }
+}
 ---
 
-<Layout>
-  <h1>Todoist Viewer</h1>
-  <a href="/create">Create</a>
-  <a href="/view">View</a>
+<Layout className="flex flex-col gap-4">
+  <p>
+    Looking for someone’s Todoist project? They should have given you a link
+    containing their token.
+  </p>
+
+  <p>
+    Looking to share your own Todoist project? Create a new token using the form
+    below. All information is stored within the token that is generated — no
+    data is stored on the server.
+  </p>
+
+  <details class="group">
+    <summary class="cursor-pointer font-semibold group-open:pb-4">
+      How does this work?
+    </summary>
+    <p>
+      The information is encrypted using a secret that only the server has
+      access to, so you can share the token without anyone knowing your key. If
+      you want to ensure that the server admin isn't able to decrypt your token
+      if they have access to it (and it's not recorded on the server when using
+      this site), consider running your own instance and setting the secret
+      yourself.
+    </p>
+  </details>
+
+  <form method="POST" class="flex flex-col items-start gap-4">
+    <Input
+      type="text"
+      name="api-key"
+      placeholder="API Key"
+      className="max-w-sm font-mono"
+      autoComplete="off"
+    />
+
+    <Input
+      type="text"
+      name="project-id"
+      placeholder="Project ID"
+      className="max-w-sm font-mono"
+      autoComplete="off"
+    />
+
+    <Button type="submit">Submit</Button>
+  </form>
 </Layout>

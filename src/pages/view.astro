@@ -3,23 +3,33 @@ import Layout from "../layouts/Layout.astro";
 import { TodoistApi } from "@doist/todoist-api-typescript";
 import { decrypt } from "../lib/crypto";
 import { SECRET } from "astro:env/server";
+import { TaskItem } from "~/components/task-item";
 
 const search = Astro.url.searchParams;
-const id = search.get("id")!;
-if (!id) throw new Error("invalid search params");
-const text = await decrypt(id, SECRET);
+const token = search.get("token")!;
+if (!token) throw new Error("no token provided");
+const text = await decrypt(token, SECRET);
 const [apiKey, projectId] = text.split(";");
 
 const client = new TodoistApi(apiKey);
+const project = await client.getProject(projectId);
 const { results: tasks } = await client.getTasks({ projectId });
 ---
 
-<Layout>
-  <h1>Todoist Viewer: View</h1>
-  <p>{apiKey}</p>
-  <p>{projectId}</p>
-  <ul>
-    {tasks.map((task) => <li>{task.content}</li>)}
-  </ul>
-  <pre><code>{JSON.stringify(tasks, null, 2)}</code></pre>
+<Layout className="flex flex-col gap-4">
+  <p>
+    Currently viewing a public project; copy the link to share with others.
+    Visit the
+    <a href="/" class="underline">home page</a> to create your own public project
+    link.
+  </p>
+
+  <div class="flex items-end gap-2 leading-none">
+    <h2 class="text-lg font-semibold">{project.name}</h2>
+    <span class="text-muted-foreground text-lg">
+      ({tasks.length === 1 ? "1 Task" : `${tasks.length} Tasks`})
+    </span>
+  </div>
+
+  {tasks.map((task) => <TaskItem task={task} />)}
 </Layout>

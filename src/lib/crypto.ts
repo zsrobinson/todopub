@@ -19,14 +19,14 @@ function base64UrlDecode(base64Url: string): Uint8Array {
 
 async function deriveKey(
   password: string,
-  salt: Uint8Array
+  salt: Uint8Array,
 ): Promise<CryptoKey> {
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
     encoder.encode(password),
     { name: "PBKDF2" },
     false,
-    ["deriveKey"]
+    ["deriveKey"],
   );
 
   return crypto.subtle.deriveKey(
@@ -39,7 +39,7 @@ async function deriveKey(
     keyMaterial,
     { name: "AES-GCM", length: 256 },
     true,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 }
 
@@ -51,12 +51,12 @@ export async function encrypt(text: string, password: string): Promise<string> {
   const encryptedData = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
-    encoder.encode(text)
+    encoder.encode(text),
   );
 
   // Concatenate salt, iv, and encrypted data into a single buffer
   const combined = new Uint8Array(
-    salt.length + iv.length + encryptedData.byteLength
+    salt.length + iv.length + encryptedData.byteLength,
   );
   combined.set(salt, 0);
   combined.set(iv, salt.length);
@@ -67,7 +67,7 @@ export async function encrypt(text: string, password: string): Promise<string> {
 
 export async function decrypt(
   encryptedBase64Url: string,
-  password: string
+  password: string,
 ): Promise<string> {
   const combined = base64UrlDecode(encryptedBase64Url);
 
@@ -80,7 +80,7 @@ export async function decrypt(
   const decryptedData = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv },
     key,
-    encryptedData
+    encryptedData,
   );
 
   return decoder.decode(decryptedData);
