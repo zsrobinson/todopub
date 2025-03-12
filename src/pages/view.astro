@@ -31,5 +31,5 @@ const { results: tasks } = await client.getTasks({ projectId });
     </span>
   </div>
 
-  {tasks.map((task) => <TaskItem task={task} />)}
+  {tasks.map((task) => <TaskItem task={task} tasks={tasks} />)}
 </Layout>
